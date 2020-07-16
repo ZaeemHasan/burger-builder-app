@@ -1,29 +1,11 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import CheckoutSummary from "../../components/Order/CheckoutSummary/CheckoutSummary";
 import ContactData from './ContactData/ContactData';
 
 class Checkout extends Component {
-
-    state = {
-        ingredients: null,
-        price: 0
-    }
-
-    componentWillMount() {
-        const query = new URLSearchParams(this.props.location.search);
-        const ingredients = {};
-        let price = 0;
-        for (let param of query.entries()) {
-            if (param[0] === 'price') {
-                price = param[1];
-            } else {
-                ingredients[param[0]] = +param[1];  // + converts it to number
-            }
-        }
-        this.setState({ ingredients: ingredients, price: price });
-    }
 
     checkoutCancelledHandler = () => {
         this.props.history.goBack();
@@ -37,14 +19,23 @@ class Checkout extends Component {
     render() {
         return (
             <div>
-                <CheckoutSummary ingredients={this.state.ingredients}
+                <CheckoutSummary ingredients={this.props.ings}
                     onCheckoutCancelled={this.checkoutCancelledHandler}
                     onCheckoutContinued={this.checkoutContinuedHandler}
                 ></CheckoutSummary>
-                <Route path={this.props.match.url + '/contact-data'} render={(props) => <ContactData ingredients={this.state.ingredients} price={this.state.price} {...props} />} />
+                <Route path={this.props.match.url + '/contact-data'} component={ContactData} />
+                {/* <Route path={this.props.match.url + '/contact-data'} render={(props) => <ContactData ingredients={this.props.ings} price={this.state.price} {...props} />} /> */}
             </div>
         );
     }
 }
 
-export default Checkout;
+const mapStateToProps = state => {
+    return {
+        ings: state.ingredients
+    };
+}
+
+// const mapDispatchToProps = dispatch => { }   // not needed here
+
+export default connect(mapStateToProps)(Checkout);
