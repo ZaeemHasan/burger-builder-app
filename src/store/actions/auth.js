@@ -48,7 +48,6 @@ export const auth = (email, password, isSignup) => {
             password: password,
             returnSecureToken: true
         };
-
         const apiKey = 'AIzaSyDca6kRSGVFeIMfsxc466QxBtvAuVQwU7A'; // old key on git
         let url = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + apiKey;
         if (!isSignup) {
