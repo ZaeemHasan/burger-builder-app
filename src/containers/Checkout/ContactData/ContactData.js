@@ -52,7 +52,8 @@ class ContactData extends Component {
                 validation: {
                     required: true,
                     minLength: 5,
-                    maxLength: 5
+                    maxLength: 5,
+                    isNumeric: true
                 },
                 valid: false,
                 errorMessages: [],
@@ -80,7 +81,8 @@ class ContactData extends Component {
                 },
                 value: '',
                 validation: {
-                    required: true
+                    required: true,
+                    isEmail: true
                 },
                 valid: false,
                 errorMessages: [],
@@ -115,10 +117,11 @@ class ContactData extends Component {
         const order = {
             ingredients: this.props.ings,
             price: (+this.props.price).toFixed(2),  // convert to number, and accept value till two digits after decimal
-            orderData: formData
+            orderData: formData,
+            userId: this.props.userId
         }
 
-        this.props.onOrderBurger(order);
+        this.props.onOrderBurger(order, this.props.token);
     }
 
     // checkValidity(value, rules) {
@@ -141,6 +144,16 @@ class ContactData extends Component {
     //         isValid = isValid && (value.trim().length <= rules.maxLength);
     //     }
 
+    // if (rules.isEmail) {
+    //     const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    //     isValid = pattern.test(value) && isValid
+    // }
+
+    // if (rules.isNumeric) {
+    //     const pattern = /^\d+$/;
+    //     isValid = pattern.test(value) && isValid
+    // }
+
     //     return isValid;
     // }
 
@@ -158,14 +171,26 @@ class ContactData extends Component {
 
         if (rules.minLength) {
             if (value.trim().length < rules.minLength)
-                errorMessages.push(`Value must be have atleast ${rules.minLength} characters`);
+                errorMessages.push(`Value must have atleast ${rules.minLength} characters`);
         }
 
         if (rules.maxLength) {
             if (value.trim().length > rules.maxLength)
-                errorMessages.push(`Value must be have atmost ${rules.maxLength} characters`);
+                errorMessages.push(`Value must have atmost ${rules.maxLength} characters`);
         }
 
+        if (rules.isEmail) {
+            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+            if (!pattern.test(value))
+                errorMessages.push(`Value must be an email`);
+        }
+
+        if (rules.isNumeric) {
+            const pattern = /^\d+$/;
+            if (!pattern.test(value))
+                errorMessages.push(`Value must be numeric`);
+        }
+        
         return errorMessages;
     }
 
@@ -239,13 +264,15 @@ const mapStateToProps = state => {
     return {
         ings: state.burgerBuilder.ingredients,
         price: state.burgerBuilder.totalPrice,
-        loading: state.order.loading
+        loading: state.order.loading,
+        token: state.auth.token,
+        userId: state.auth.userId
     };
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+        onOrderBurger: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
     };
 }
 
