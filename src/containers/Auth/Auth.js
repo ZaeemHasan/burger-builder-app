@@ -6,9 +6,11 @@ import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
 import Spinner from '../../components/UI/Spinner/Spinner';
 
+import * as actions from '../../store/actions/index';
+import { updateObject, checkValidity } from '../../shared/utility';
+
 import classes from './Auth.module.css';
 
-import * as actions from '../../store/actions/index';
 
 
 class Auth extends Component {
@@ -56,67 +58,24 @@ class Auth extends Component {
         }
     }
 
-    checkValidity(value, rules) {
-        let errorMessages = [];
-        // just additional rule in cases where validation is not defined
-        if (!rules) {
-            return errorMessages
-        }
-
-        if (rules.required) {
-            if (value.trim() === '')
-                errorMessages.push(`Value is required`);
-        }
-
-        if (rules.minLength) {
-            if (value.trim().length < rules.minLength)
-                errorMessages.push(`Value must have atleast ${rules.minLength} characters`);
-        }
-
-        if (rules.maxLength) {
-            if (value.trim().length > rules.maxLength)
-                errorMessages.push(`Value must have atmost ${rules.maxLength} characters`);
-        }
-
-        if (rules.isEmail) {
-            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-            if (!pattern.test(value))
-                errorMessages.push(`Value must be an email`);
-        }
-
-        if (rules.isNumeric) {
-            const pattern = /^\d+$/;
-            if (!pattern.test(value))
-                errorMessages.push(`Value must be numeric`);
-        }
-
-        return errorMessages;
-    }
-
     inputChangedHandler = (event, controlName) => {
-        console.log(event.target.value, controlName);
-        const updatedControls = {
-            ...this.state.controls
-        };
-        const updatedFormElement = {
-            ...updatedControls[controlName]
-        };
-        updatedFormElement.value = event.target.value;
-        // updatedFormElement.valid = this.checkValidity(updatedFormElement.value, updatedFormElement.validation);
 
-        let containsErrors = this.checkValidity(updatedFormElement.value, updatedFormElement.validation);
-        updatedFormElement.valid = containsErrors.length === 0;
-        updatedFormElement.errorMessages = containsErrors;
-        updatedFormElement.touched = true;
+        let containsErrors = checkValidity(event.target.value,
+            this.state.controls[controlName].validation);
 
-        updatedControls[controlName] = updatedFormElement;
+        const updatedControls = updateObject(this.state.controls, {
+            [controlName]: updateObject(this.state.controls[controlName], {
+                value: event.target.value,
+                valid: containsErrors.length === 0,
+                errorMessages: containsErrors,
+                touched: true
+            })
+        });
 
         let formIsValid = true;
         for (let controlName in updatedControls) {
             formIsValid = formIsValid && updatedControls[controlName].valid;
         }
-
-        console.log(formIsValid, updatedFormElement);
 
         this.setState({ controls: updatedControls, formIsValid: formIsValid });
 

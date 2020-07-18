@@ -48,7 +48,8 @@ export const auth = (email, password, isSignup) => {
             password: password,
             returnSecureToken: true
         };
-        const apiKey = 'AIzaSyDca6kRSGVFeIMfsxc466QxBtvAuVQwU7A';
+
+        const apiKey = 'AIzaSyDca6kRSGVFeIMfsxc466QxBtvAuVQwU7A'; // old key on git
         let url = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + apiKey;
         if (!isSignup) {
             url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + apiKey;
@@ -56,7 +57,6 @@ export const auth = (email, password, isSignup) => {
 
         axios.post(url, authData)
             .then(res => {
-                console.log(res);
                 const expirationDate = new Date(new Date().getTime() + res.data.expiresIn * 1000);
                 localStorage.setItem('token', res.data.idToken);
                 localStorage.setItem('userId', res.data.localId);
@@ -65,7 +65,6 @@ export const auth = (email, password, isSignup) => {
                 dispatch(checkAuthTimeout(res.data.expiresIn));
             })
             .catch(err => {
-                console.log(err.response.data.error);
                 dispatch(authFail(err.response.data.error));
             });
     };

@@ -8,10 +8,6 @@ const navigationItem = (props) => (
         <NavLink to={props.link} exact={props.exact} activeClassName={classes.active}>
             {props.children}
         </NavLink>
-        {/* <a href=
-            className={props.active ? classes.active : null}>
-            
-        </a> */}
     </li>
 );
 

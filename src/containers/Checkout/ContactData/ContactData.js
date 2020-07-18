@@ -7,6 +7,7 @@ import Input from '../../../components/UI/Input/Input';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../../axios-orders';
 import * as actions from '../../../store/actions/index';
+import { updateObject, checkValidity } from '../../../shared/utility';
 
 import classes from './ContactData.module.css';
 
@@ -124,103 +125,25 @@ class ContactData extends Component {
         this.props.onOrderBurger(order, this.props.token);
     }
 
-    // checkValidity(value, rules) {
-    //     let isValid = true;
-
-    //     // just additional rule in cases where validation is not defined
-    //     if (!rules) {
-    //         return true;
-    //     }
-
-    //     if (rules.required) {
-    //         isValid = isValid && (value.trim() !== '');
-    //     }
-
-    //     if (rules.minLength) {
-    //         isValid = isValid && (value.trim().length >= rules.minLength);
-    //     }
-
-    //     if (rules.maxLength) {
-    //         isValid = isValid && (value.trim().length <= rules.maxLength);
-    //     }
-
-    // if (rules.isEmail) {
-    //     const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-    //     isValid = pattern.test(value) && isValid
-    // }
-
-    // if (rules.isNumeric) {
-    //     const pattern = /^\d+$/;
-    //     isValid = pattern.test(value) && isValid
-    // }
-
-    //     return isValid;
-    // }
-
-    checkValidity(value, rules) {
-        let errorMessages = [];
-        // just additional rule in cases where validation is not defined
-        if (!rules) {
-            return errorMessages
-        }
-
-        if (rules.required) {
-            if (value.trim() === '')
-                errorMessages.push(`Value is required`);
-        }
-
-        if (rules.minLength) {
-            if (value.trim().length < rules.minLength)
-                errorMessages.push(`Value must have atleast ${rules.minLength} characters`);
-        }
-
-        if (rules.maxLength) {
-            if (value.trim().length > rules.maxLength)
-                errorMessages.push(`Value must have atmost ${rules.maxLength} characters`);
-        }
-
-        if (rules.isEmail) {
-            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-            if (!pattern.test(value))
-                errorMessages.push(`Value must be an email`);
-        }
-
-        if (rules.isNumeric) {
-            const pattern = /^\d+$/;
-            if (!pattern.test(value))
-                errorMessages.push(`Value must be numeric`);
-        }
-        
-        return errorMessages;
-    }
-
     inputChangedHandler = (event, inputIdentifier) => {
-        console.log(event.target.value, inputIdentifier);
-        const updatedOrderForm = {
-            ...this.state.orderForm
-        };
-        const updatedFormElement = {
-            ...updatedOrderForm[inputIdentifier]
-        };
-        updatedFormElement.value = event.target.value;
-        // updatedFormElement.valid = this.checkValidity(updatedFormElement.value, updatedFormElement.validation);
+        let containsErrors = checkValidity(event.target.value,
+            this.state.orderForm[inputIdentifier].validation);
 
-        let containsErrors = this.checkValidity(updatedFormElement.value, updatedFormElement.validation);
-        updatedFormElement.valid = containsErrors.length === 0;
-        updatedFormElement.errorMessages = containsErrors;
-
-        updatedFormElement.touched = true;
-        updatedOrderForm[inputIdentifier] = updatedFormElement;
+        const updatedOrderForm = updateObject(this.state.orderForm, {
+            [inputIdentifier]: updateObject(this.state.orderForm[inputIdentifier], {
+                value: event.target.value,
+                valid: containsErrors.length === 0,
+                errorMessages: containsErrors,
+                touched: true
+            })
+        });
 
         let formIsValid = true;
         for (let inputIdentifier in updatedOrderForm) {
             formIsValid = formIsValid && updatedOrderForm[inputIdentifier].valid;
         }
-
-        console.log(formIsValid, updatedFormElement);
-
+        
         this.setState({ orderForm: updatedOrderForm, formIsValid: formIsValid });
-
     }
 
     render() {
