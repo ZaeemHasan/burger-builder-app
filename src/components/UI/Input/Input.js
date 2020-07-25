@@ -14,9 +14,6 @@ const input = (props) => {
         ));
     }
 
-    // if (props.invalid && props.touched) {
-    // }
-
     switch (props.elementType) {
         case ('input'):
             inputElement = <input

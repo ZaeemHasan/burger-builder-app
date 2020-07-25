@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import Aux from '../../../hoc/Aux/aux';
 import Button from '../../UI/Button/Button';
@@ -22,7 +22,7 @@ const orderSummary = props => {
             <p><strong>Total Price: ${props.price.toFixed(2)}</strong></p>
             <p>Continue to Checkout?</p>
             <Button btnType={"Danger"} clicked={props.purchaseCancelled}>CANCEL</Button>
-            <Button btnType={"Success"} clicked={props.purchaseContinue}>CONTINUE</Button>
+            <Button btnType={"Success"} clicked={props.purchaseContinued}>CONTINUE</Button>
         </Aux>
     );
 }

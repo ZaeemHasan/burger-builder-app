@@ -28,7 +28,8 @@ export function* authUserSaga(action) {
         returnSecureToken: true
     };
 
-    const apiKey = 'AIzaSyDca6kRSGVFeIMfsxc466QxBtvAuVQwU7A'; // old key on git
+    // const apiKey = 'AIzaSyDca6kRSGVFeIMfsxc466QxBtvAuVQwU7A'; // old key on git
+    const apiKey = 'AIzaSyDrj1sXeriUqHhUzNZ9z1w4YFrpjT4CilI';
     let url = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + apiKey;
     if (!action.isSignup) {
         url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + apiKey;
